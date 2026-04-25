@@ -1,0 +1,18 @@
+<svg viewBox="0 0 80 120" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <!-- Hands on ground (bottom) -->
+  <line x1="5" y1="113" x2="25" y2="113" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+  <line x1="55" y1="113" x2="75" y2="113" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+  <!-- Arms from hands up to shoulder junction -->
+  <line x1="15" y1="113" x2="40" y2="87" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+  <line x1="65" y1="113" x2="40" y2="87" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+  <!-- Head (accent colour — nestled between hands, near ground) -->
+  <circle cx="40" cy="110" r="7" fill="#059669"/>
+  <!-- Torso -->
+  <line x1="40" y1="87" x2="40" y2="52" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+  <!-- Legs spreading upward -->
+  <line x1="40" y1="52" x2="27" y2="13" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+  <line x1="40" y1="52" x2="53" y2="13" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+  <!-- Feet in air (top) -->
+  <line x1="15" y1="6" x2="35" y2="6" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+  <line x1="45" y1="6" x2="65" y2="6" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+</svg>

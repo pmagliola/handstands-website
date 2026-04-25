@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Handstands builds data tools for people who run businesses, not engineering teams.">
+  <title>Handstands - Data tools that do the heavy lifting</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #ffffff;
+      --bg-subtle:    #F8FAFC;
+      --text:         #0F172A;
+      --text-muted:   #64748B;
+      --accent:       #059669;
+      --accent-hover: #047857;
+      --accent-light: #ECFDF5;
+      --secondary:        #7C3AED;
+      --secondary-light:  #F5F3FF;
+      --secondary-border: #DDD6FE;
+      --border:       #E2E8F0;
+      --shadow:       0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+      --shadow-hover: 0 4px 10px rgba(0,0,0,0.10), 0 16px 32px rgba(0,0,0,0.09);
+      --radius:       14px;
+      --font:         'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.90);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+    }
+
+    .nav-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo-mark {
+      flex-shrink: 0;
+    }
+
+    .nav-wordmark {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+    }
+
+    .nav-wordmark .dot-io {
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: var(--text) !important;
+      color: #fff !important;
+      padding: 8px 18px;
+      border-radius: 8px;
+      transition: background 0.15s !important;
+    }
+
+    .nav-cta:hover { background: #1e293b !important; color: #fff !important; }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 100px 24px 88px;
+      text-align: center;
+    }
+
+    .hero-inner {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--secondary-light);
+      color: var(--secondary);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 5px 13px;
+      border-radius: 100px;
+      margin-bottom: 30px;
+      border: 1px solid var(--secondary-border);
+      letter-spacing: 0.1px;
+    }
+
+    .hero-badge-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--secondary);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    h1 {
+      font-size: clamp(40px, 6.5vw, 62px);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -2px;
+      color: var(--text);
+      margin-bottom: 22px;
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      font-size: clamp(17px, 2.2vw, 20px);
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto 40px;
+      line-height: 1.65;
+      font-weight: 400;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 13px 24px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: background 0.15s, transform 0.15s, border-color 0.15s;
+      font-family: var(--font);
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover { background: var(--accent-hover); }
+
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 1.5px solid var(--border);
+    }
+
+    .btn-secondary:hover { border-color: #94a3b8; }
+
+    /* ── PRODUCTS ── */
+    .products {
+      background: var(--bg-subtle);
+      padding: 80px 24px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      margin-bottom: 48px;
+    }
+
+    .section-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--secondary);
+      margin-bottom: 12px;
+    }
+
+    .section-header h2 {
+      font-size: clamp(26px, 4vw, 36px);
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      line-height: 1.15;
+      margin-bottom: 10px;
+    }
+
+    .section-header p {
+      font-size: 17px;
+      color: var(--text-muted);
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .product-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      transition: box-shadow 0.2s, transform 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-2px);
+    }
+
+    .product-card.muted { opacity: 0.6; }
+    .product-card.muted:hover { transform: none; box-shadow: var(--shadow); }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .card-icon {
+      width: 46px;
+      height: 46px;
+      background: var(--accent-light);
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      padding: 4px 10px;
+      border-radius: 100px;
+      text-transform: uppercase;
+    }
+
+    .badge-live   { background: #DCFCE7; color: #15803D; }
+    .badge-soon   { background: #F1F5F9; color: #64748B; }
+
+    .product-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-bottom: 9px;
+    }
+
+    .product-card p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.65;
+      flex: 1;
+    }
+
+    .card-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 24px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+      transition: gap 0.15s;
+    }
+
+    .card-link:hover { gap: 9px; }
+
+    .card-link.disabled {
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* ── EMAIL CAPTURE ── */
+    .notify {
+      padding: 88px 24px;
+      text-align: center;
+    }
+
+    .notify-inner {
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    .notify h2 {
+      font-size: clamp(26px, 4vw, 36px);
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      line-height: 1.15;
+      margin-bottom: 12px;
+    }
+
+    .notify > .notify-inner > p {
+      font-size: 17px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+
+    .email-form {
+      display: flex;
+      gap: 8px;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .email-form input[type="email"] {
+      flex: 1;
+      padding: 13px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: var(--font);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+      background: var(--bg);
+    }
+
+    .email-form input[type="email"]:focus { border-color: var(--accent); }
+    .email-form input[type="email"]::placeholder { color: #94a3b8; }
+
+    .email-form button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 13px 22px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    .email-form button:hover { background: var(--accent-hover); }
+
+    .form-note {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-top: 12px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+    }
+
+    .footer-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .footer-brand span {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      font-size: 14px;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    /* ── MOBILE ── */
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .hero { padding: 72px 20px 64px; }
+      .email-form { flex-direction: column; }
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="/">
+      <svg class="logo-mark" width="26" height="39" viewBox="0 0 80 120" xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true">
+        <line x1="5" y1="113" x2="25" y2="113" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="55" y1="113" x2="75" y2="113" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="15" y1="113" x2="40" y2="87" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="65" y1="113" x2="40" y2="87" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="40" cy="110" r="7" fill="#059669"/>
+        <line x1="40" y1="87" x2="40" y2="52" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="40" y1="52" x2="27" y2="13" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="40" y1="52" x2="53" y2="13" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="15" y1="6" x2="35" y2="6" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="45" y1="6" x2="65" y2="6" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+      </svg>
+      <span class="nav-wordmark">handstands<span class="dot-io">.io</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#products">Products</a></li>
+      <li><a href="mailto:hello@handstands.io">Contact</a></li>
+      <li><a href="#notify" class="nav-cta">Get notified</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      First tool now live on Apify
+    </div>
+    <h1>Data tools that do the <em>heavy lifting.</em></h1>
+    <p class="hero-sub">Handstands builds simple, powerful tools that extract, monitor, and surface data - so you can focus on running your business, not your tech stack.</p>
+    <div class="hero-actions">
+      <a href="https://apify.com/handstands.io/shopify-store-intelligence" class="btn btn-primary" target="_blank" rel="noopener">
+        View Shopify Intelligence
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+      </a>
+      <a href="#notify" class="btn btn-secondary">
+        Get notified of new tools
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── PRODUCTS ── -->
+<section class="products" id="products">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-label">Our tools</div>
+      <h2>Built for people who run businesses,<br>not engineering teams.</h2>
+      <p>No APIs to wrangle. No scraping. No proxies. Just clean data, on demand.</p>
+    </div>
+
+    <div class="products-grid">
+
+      <div class="product-card">
+        <div class="card-top">
+          <div class="card-icon">🛍️</div>
+          <span class="badge badge-live">Live</span>
+        </div>
+        <h3>Shopify Store Intelligence</h3>
+        <p>Monitor any Shopify store's full product catalog. Track price changes, new listings, discounts, and inventory - automatically, across as many stores as you want.</p>
+        <a href="https://apify.com/handstands.io/shopify-store-intelligence" class="card-link" target="_blank" rel="noopener">
+          View on Apify
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+      </div>
+
+      <div class="product-card muted">
+        <div class="card-top">
+          <div class="card-icon">🏗️</div>
+          <span class="badge badge-soon">Coming soon</span>
+        </div>
+        <h3>US Building Permit Intelligence</h3>
+        <p>Raw US construction permit data, enriched with contractor contacts. Warm leads for solar, roofing, HVAC, and construction suppliers - at a fraction of enterprise pricing.</p>
+        <span class="card-link disabled">Coming soon</span>
+      </div>
+
+      <div class="product-card muted">
+        <div class="card-top">
+          <div class="card-icon">⚖️</div>
+          <span class="badge badge-soon">Coming soon</span>
+        </div>
+        <h3>Clio Power Tools</h3>
+        <p>A faster Clio for lawyers who bill by the hour. One-click timers, smart time entry fill, and a live daily billing sidebar - embedded directly in the Clio interface.</p>
+        <span class="card-link disabled">Coming soon</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── EMAIL CAPTURE ── -->
+<section class="notify" id="notify">
+  <div class="notify-inner">
+    <h2>Be first to know when we launch</h2>
+    <p>New tools drop a few times a year. No spam - just a note when something useful is ready.</p>
+    <!-- Sign up at formspree.io and replace mgorqyrz below -->
+    <form class="email-form" action="https://formspree.io/f/mgorqyrz" method="POST">
+      <input type="email" name="email" placeholder="you@yourcompany.com" required autocomplete="email">
+      <button type="submit">Notify me</button>
+    </form>
+    <p class="form-note">No spam, ever. Unsubscribe anytime.</p>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <svg width="18" height="27" viewBox="0 0 80 120" xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true">
+        <line x1="5" y1="113" x2="25" y2="113" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="55" y1="113" x2="75" y2="113" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="15" y1="113" x2="40" y2="87" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="65" y1="113" x2="40" y2="87" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="40" cy="110" r="7" fill="#059669"/>
+        <line x1="40" y1="87" x2="40" y2="52" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="40" y1="52" x2="27" y2="13" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="40" y1="52" x2="53" y2="13" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="15" y1="6" x2="35" y2="6" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="45" y1="6" x2="65" y2="6" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+      </svg>
+      <span>© 2026 Handstands.</span>
+    </div>
+    <div class="footer-links">
+      <a href="https://apify.com/handstands.io/shopify-store-intelligence" target="_blank" rel="noopener">Apify Store</a>
+      <a href="mailto:hello@handstands.io">Contact</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
