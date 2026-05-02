@@ -1,0 +1,22 @@
+<svg width="192" height="192" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="192" height="192" rx="38" fill="#ECFDF5"/>
+
+  <!-- Building outline -->
+  <rect x="54" y="72" width="56" height="72" rx="4" fill="none" stroke="#059669" stroke-width="8" stroke-linejoin="round"/>
+
+  <!-- Building roof peak -->
+  <polyline points="48,76 82,48 110,76" fill="none" stroke="#059669" stroke-width="8" stroke-linejoin="round"/>
+
+  <!-- Door -->
+  <rect x="72" y="116" width="20" height="28" rx="3" fill="#059669" opacity="0.25" stroke="#059669" stroke-width="4"/>
+
+  <!-- Windows -->
+  <rect x="62" y="88" width="14" height="14" rx="2" fill="#059669" opacity="0.4"/>
+  <rect x="88" y="88" width="14" height="14" rx="2" fill="#059669" opacity="0.4"/>
+
+  <!-- Location pin -->
+  <circle cx="136" cy="76" r="16" fill="#0F172A"/>
+  <path d="M136 56 C124 56 118 65 118 74 C118 86 136 104 136 104 C136 104 154 86 154 74 C154 65 148 56 136 56Z" fill="#059669"/>
+  <circle cx="136" cy="74" r="6" fill="white"/>
+</svg>
