@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Pull fresh building permit data from 36 US cities. New construction, renovation, and re-roof permits with contractor names, project values, and addresses. Built for solar, roofing, HVAC, and construction lead gen.">
+  <title>US Building Permit Data — Construction Lead Generation | Handstands</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #ffffff;
+      --bg-subtle:    #F8FAFC;
+      --text:         #0F172A;
+      --text-muted:   #64748B;
+      --accent:       #059669;
+      --accent-hover: #047857;
+      --accent-light: #ECFDF5;
+      --border:       #E2E8F0;
+      --shadow:       0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+      --radius:       14px;
+      --font:         'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+    /* NAV */
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.90); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); padding: 0 24px; }
+    .nav-inner { max-width: 1080px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
+    .nav-wordmark { font-size: 17px; font-weight: 700; letter-spacing: -0.4px; }
+    .nav-wordmark .dot-io { color: var(--accent); }
+    .nav-cta { background: var(--text); color: #fff; padding: 8px 18px; border-radius: 8px; font-size: 14px; font-weight: 500; text-decoration: none; }
+
+    /* HERO */
+    .hero { padding: 88px 24px 72px; text-align: center; }
+    .hero-inner { max-width: 760px; margin: 0 auto; }
+    .eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); margin-bottom: 18px; }
+    h1 { font-size: clamp(36px, 5.5vw, 56px); font-weight: 800; line-height: 1.1; letter-spacing: -1.8px; margin-bottom: 22px; }
+    h1 em { font-style: normal; color: var(--accent); }
+    .hero-sub { font-size: clamp(17px, 2vw, 20px); color: var(--text-muted); max-width: 580px; margin: 0 auto 40px; line-height: 1.65; }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: 7px; font-size: 15px; font-weight: 600; padding: 13px 24px; border-radius: 10px; text-decoration: none; transition: all 0.15s; font-family: var(--font); cursor: pointer; border: none; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary { background: var(--bg); color: var(--text); border: 1.5px solid var(--border); }
+    .btn-secondary:hover { border-color: #94a3b8; }
+
+    /* STATS BAR */
+    .stats { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 32px 24px; }
+    .stats-inner { max-width: 1080px; margin: 0 auto; display: flex; justify-content: center; gap: 60px; flex-wrap: wrap; }
+    .stat { text-align: center; }
+    .stat-number { font-size: 32px; font-weight: 800; letter-spacing: -1px; color: var(--text); line-height: 1; }
+    .stat-label { font-size: 13px; color: var(--text-muted); margin-top: 5px; font-weight: 500; }
+
+    /* SECTIONS */
+    section.content { padding: 80px 24px; }
+    section.content.alt { background: var(--bg-subtle); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .section-inner { max-width: 1080px; margin: 0 auto; }
+    .section-label { font-size: 11.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+    h2 { font-size: clamp(24px, 3.5vw, 34px); font-weight: 800; letter-spacing: -0.8px; line-height: 1.15; margin-bottom: 16px; }
+    .section-sub { font-size: 17px; color: var(--text-muted); margin-bottom: 48px; max-width: 600px; }
+
+    /* VERTICALS */
+    .verticals-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .vertical-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); }
+    .vertical-icon { font-size: 28px; margin-bottom: 14px; }
+    .vertical-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.3px; }
+    .vertical-card p { font-size: 15px; color: var(--text-muted); line-height: 1.65; }
+    .vertical-card ul { margin-top: 12px; padding-left: 18px; }
+    .vertical-card ul li { font-size: 14px; color: var(--text-muted); margin-bottom: 5px; }
+
+    /* DATA TABLE */
+    .data-preview { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); overflow-x: auto; box-shadow: var(--shadow); }
+    .data-preview table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 700px; }
+    .data-preview th { background: var(--bg-subtle); padding: 12px 16px; text-align: left; font-weight: 600; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.5px; }
+    .data-preview td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text); }
+    .data-preview tr:last-child td { border-bottom: none; }
+    .data-preview tr:nth-child(even) td { background: #FAFBFC; }
+    .tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; background: var(--accent-light); color: var(--accent); }
+
+    /* CITIES */
+    .cities-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+    .city-item { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+    .city-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+    /* WORKFLOW */
+    .steps { display: flex; flex-direction: column; gap: 24px; max-width: 680px; }
+    .step { display: flex; gap: 20px; align-items: flex-start; }
+    .step-num { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step-content h4 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .step-content p { font-size: 15px; color: var(--text-muted); }
+
+    /* PRICING */
+    .pricing-card { max-width: 480px; background: var(--bg); border: 2px solid var(--accent); border-radius: var(--radius); padding: 36px; box-shadow: var(--shadow); }
+    .price { font-size: 48px; font-weight: 800; letter-spacing: -2px; color: var(--text); margin: 12px 0 4px; }
+    .price span { font-size: 20px; font-weight: 500; color: var(--text-muted); letter-spacing: 0; }
+    .pricing-note { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+    .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+    .pricing-features li { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; }
+    .check { color: var(--accent); font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* FAQ */
+    .faq { display: flex; flex-direction: column; gap: 28px; max-width: 720px; }
+    .faq-item h4 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .faq-item p { font-size: 15px; color: var(--text-muted); line-height: 1.65; }
+
+    /* CTA */
+    .cta-section { padding: 80px 24px; text-align: center; background: var(--text); color: #fff; }
+    .cta-section h2 { color: #fff; margin-bottom: 16px; }
+    .cta-section p { color: rgba(255,255,255,0.65); font-size: 18px; margin-bottom: 36px; }
+    .btn-white { background: #fff; color: var(--text); }
+    .btn-white:hover { background: #f1f5f9; }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 28px 24px; }
+    .footer-inner { max-width: 1080px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .footer-brand { display: flex; align-items: center; gap: 10px; }
+    .footer-brand span { font-size: 14px; color: var(--text-muted); }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { font-size: 14px; color: var(--text-muted); text-decoration: none; }
+    .footer-links a:hover { color: var(--text); }
+
+    @media (max-width: 640px) {
+      .stats-inner { gap: 32px; }
+      .hero { padding: 60px 20px 48px; }
+      .cta-section { padding: 60px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="/">
+      <svg width="22" height="33" viewBox="0 0 80 120" xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true">
+        <line x1="5" y1="113" x2="25" y2="113" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="55" y1="113" x2="75" y2="113" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="15" y1="113" x2="40" y2="87" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="65" y1="113" x2="40" y2="87" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="40" cy="110" r="7" fill="#059669"/>
+        <line x1="40" y1="87" x2="40" y2="52" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="40" y1="52" x2="27" y2="13" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="40" y1="52" x2="53" y2="13" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="15" y1="6" x2="35" y2="6" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="45" y1="6" x2="65" y2="6" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+      </svg>
+      <span class="nav-wordmark">handstands<span class="dot-io">.io</span></span>
+    </a>
+    <a href="https://apify.com/handstands.io/us-building-permit-scraper" class="nav-cta" target="_blank" rel="noopener">Try it free →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">Building permit data · 36 US cities</div>
+    <h1>Find construction leads <em>before</em> your competitors do.</h1>
+    <p class="hero-sub">Pull fresh building permits across 36 US cities. New construction, renovation, and re-roof permits — with contractor names, project values, and addresses. Updated daily in most cities.</p>
+    <div class="hero-actions">
+      <a href="https://apify.com/handstands.io/us-building-permit-scraper" class="btn btn-primary" target="_blank" rel="noopener">
+        Try it free
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+      </a>
+      <a href="#how-it-works" class="btn btn-secondary">See how it works</a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stats-inner">
+    <div class="stat">
+      <div class="stat-number">36</div>
+      <div class="stat-label">US cities covered</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">Daily</div>
+      <div class="stat-label">Updates in most cities</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">$1.50</div>
+      <div class="stat-label">Per 1,000 permits</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">2–6 wk</div>
+      <div class="stat-label">Lead window ahead of competitors</div>
+    </div>
+  </div>
+</div>
+
+<!-- VERTICALS -->
+<section class="content alt">
+  <div class="section-inner">
+    <div class="section-label">Who uses this</div>
+    <h2>Built for construction lead gen</h2>
+    <p class="section-sub">Building permits are the earliest signal that a project is happening. Here's how each vertical uses the data.</p>
+    <div class="verticals-grid">
+      <div class="vertical-card">
+        <div class="vertical-icon">☀️</div>
+        <h3>Solar Installers</h3>
+        <p>New construction permits mean new homes — your target buyer. Get there before anyone's on site.</p>
+        <ul>
+          <li>Filter to residential new construction</li>
+          <li>Set a minimum project value ($200k+)</li>
+          <li>Reach the builder or buyer 4–8 weeks early</li>
+        </ul>
+      </div>
+      <div class="vertical-card">
+        <div class="vertical-icon">🏗️</div>
+        <h3>Roofing Contractors</h3>
+        <p>New construction, renovations, and re-roofs — all in one dataset. GC name on most permits means you can call the builder directly.</p>
+        <ul>
+          <li>Filter by permit type (new build, re-roof)</li>
+          <li>Get GC name for direct outreach</li>
+          <li>Land preferred sub relationships worth 10+ jobs/year</li>
+        </ul>
+      </div>
+      <div class="vertical-card">
+        <div class="vertical-icon">🌡️</div>
+        <h3>HVAC Companies</h3>
+        <p>New construction permits give you a 3–5 week window before a mechanical sub is locked in. Call the GC with a specific project reference.</p>
+        <ul>
+          <li>Filter to new construction over $150k project value</li>
+          <li>Contractor name in most cities</li>
+          <li>Proactive outreach beats reactive response</li>
+        </ul>
+      </div>
+      <div class="vertical-card">
+        <div class="vertical-icon">📊</div>
+        <h3>Lead Gen & Data Companies</h3>
+        <p>Clean, structured permit data across 36 cities at $1.50/1,000 records. Build lead gen products, research tools, or market analysis on top.</p>
+        <ul>
+          <li>Consistent schema across all cities</li>
+          <li>Lat/long coordinates where available</li>
+          <li>Custom Socrata endpoints for additional cities</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DATA PREVIEW -->
+<section class="content">
+  <div class="section-inner">
+    <div class="section-label">Sample data</div>
+    <h2>What you get</h2>
+    <p class="section-sub">Every permit returns the same clean fields — no normalisation needed.</p>
+    <div class="data-preview">
+      <table>
+        <thead>
+          <tr>
+            <th>City</th>
+            <th>Address</th>
+            <th>Permit Type</th>
+            <th>Project Value</th>
+            <th>Contractor</th>
+            <th>Issue Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Chicago, IL</td>
+            <td>2847 N Clark St</td>
+            <td><span class="tag">New Construction</span></td>
+            <td>$485,000</td>
+            <td>Meridian Build Group</td>
+            <td>2026-05-12</td>
+          </tr>
+          <tr>
+            <td>Austin, TX</td>
+            <td>14205 Barrie Dr</td>
+            <td><span class="tag">New Construction</span></td>
+            <td>$312,000</td>
+            <td>Lennar Homes LLC</td>
+            <td>2026-05-14</td>
+          </tr>
+          <tr>
+            <td>Nashville, TN</td>
+            <td>4812 Gallatin Pike</td>
+            <td><span class="tag">Renovation</span></td>
+            <td>$198,000</td>
+            <td>Crestwood Construction</td>
+            <td>2026-05-13</td>
+          </tr>
+          <tr>
+            <td>Seattle, WA</td>
+            <td>921 NE 65th St</td>
+            <td><span class="tag">Addition</span></td>
+            <td>$145,000</td>
+            <td>Pacific NW Contractors</td>
+            <td>2026-05-11</td>
+          </tr>
+          <tr>
+            <td>Raleigh, NC</td>
+            <td>3304 Six Forks Rd</td>
+            <td><span class="tag">New Construction</span></td>
+            <td>$520,000</td>
+            <td>Triangle Home Builders</td>
+            <td>2026-05-15</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13px; color: var(--text-muted); margin-top: 12px;">Also returns: permit number, contractor license number, status, description, and lat/long coordinates where available.</p>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="content alt" id="how-it-works">
+  <div class="section-inner">
+    <div class="section-label">How it works</div>
+    <h2>From permits to pipeline in minutes</h2>
+    <p class="section-sub">No code required. Configure, run, export.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Choose your cities and filters</h4>
+          <p>Select from 36 US cities. Filter by permit type (new construction, renovation, re-roof), date range, and minimum project value. Set once and reuse.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Run on demand or on a schedule</h4>
+          <p>Run manually or set a daily/weekly schedule in Apify. Each run pulls the latest permits matching your filters. A week of Chicago permits costs under $0.50.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Export or connect to your CRM</h4>
+          <p>Download as CSV/Excel, or connect via Zapier or Make to push permits directly into Google Sheets, HubSpot, Pipedrive, or any CRM. Automated workflows available.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Reach the right people fast</h4>
+          <p>Permit data has a 2–6 week lead window. Call the contractor or property owner within 48 hours of issue date for the best response rates.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CITIES -->
+<section class="content">
+  <div class="section-inner">
+    <div class="section-label">Coverage</div>
+    <h2>36 US cities and counties</h2>
+    <p class="section-sub">Most cities update daily via official government open data APIs. More cities added regularly.</p>
+    <div class="cities-grid">
+      <div class="city-item"><span class="city-dot"></span>Chicago, IL</div>
+      <div class="city-item"><span class="city-dot"></span>New York City, NY</div>
+      <div class="city-item"><span class="city-dot"></span>Los Angeles, CA</div>
+      <div class="city-item"><span class="city-dot"></span>Seattle, WA</div>
+      <div class="city-item"><span class="city-dot"></span>Austin, TX</div>
+      <div class="city-item"><span class="city-dot"></span>Nashville, TN</div>
+      <div class="city-item"><span class="city-dot"></span>Raleigh, NC</div>
+      <div class="city-item"><span class="city-dot"></span>Denver, CO</div>
+      <div class="city-item"><span class="city-dot"></span>Miami, FL</div>
+      <div class="city-item"><span class="city-dot"></span>Columbus, OH</div>
+      <div class="city-item"><span class="city-dot"></span>San Francisco, CA</div>
+      <div class="city-item"><span class="city-dot"></span>San Diego County, CA</div>
+      <div class="city-item"><span class="city-dot"></span>Maricopa County, AZ</div>
+      <div class="city-item"><span class="city-dot"></span>Philadelphia, PA</div>
+      <div class="city-item"><span class="city-dot"></span>Minneapolis, MN</div>
+      <div class="city-item"><span class="city-dot"></span>Baltimore, MD</div>
+      <div class="city-item"><span class="city-dot"></span>Louisville, KY</div>
+      <div class="city-item"><span class="city-dot"></span>Sacramento, CA</div>
+      <div class="city-item"><span class="city-dot"></span>Tacoma, WA</div>
+      <div class="city-item"><span class="city-dot"></span>Orlando, FL</div>
+      <div class="city-item"><span class="city-dot"></span>Cincinnati, OH</div>
+      <div class="city-item"><span class="city-dot"></span>Fort Worth, TX</div>
+      <div class="city-item"><span class="city-dot"></span>Dallas, TX</div>
+      <div class="city-item"><span class="city-dot"></span>Tempe, AZ</div>
+      <div class="city-item"><span class="city-dot"></span>Norfolk, VA</div>
+      <div class="city-item"><span class="city-dot"></span>Buffalo, NY</div>
+      <div class="city-item"><span class="city-dot"></span>Baton Rouge, LA</div>
+      <div class="city-item"><span class="city-dot"></span>New Orleans, LA</div>
+      <div class="city-item"><span class="city-dot"></span>Gainesville, FL</div>
+      <div class="city-item"><span class="city-dot"></span>Greensboro, NC</div>
+      <div class="city-item"><span class="city-dot"></span>Anaheim, CA</div>
+      <div class="city-item"><span class="city-dot"></span>Washington DC</div>
+      <div class="city-item"><span class="city-dot"></span>Reno, NV</div>
+      <div class="city-item"><span class="city-dot"></span>Sparks, NV</div>
+      <div class="city-item"><span class="city-dot"></span>Washoe County, NV</div>
+      <div class="city-item"><span class="city-dot"></span>Douglas County, NV</div>
+    </div>
+    <p style="font-size:14px; color: var(--text-muted); margin-top: 20px;">Need a city not listed? Any city running Socrata open data can be added via custom endpoint configuration.</p>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="content alt">
+  <div class="section-inner">
+    <div class="section-label">Pricing</div>
+    <h2>Simple pay-per-use</h2>
+    <p class="section-sub">No subscription. No monthly fee. Pay only for what you pull.</p>
+    <div class="pricing-card">
+      <div class="section-label">Pay per result</div>
+      <div class="price">$1.50 <span>/ 1,000 permits</span></div>
+      <p class="pricing-note">1,000 free trial permits included. No credit card required to start.</p>
+      <ul class="pricing-features">
+        <li><span class="check">✓</span> All 36 cities in every run</li>
+        <li><span class="check">✓</span> Filter by city, type, date, project value</li>
+        <li><span class="check">✓</span> CSV, JSON, Excel export</li>
+        <li><span class="check">✓</span> Zapier &amp; Make integration</li>
+        <li><span class="check">✓</span> Schedule daily or weekly runs</li>
+        <li><span class="check">✓</span> Custom Socrata endpoints</li>
+      </ul>
+      <a href="https://apify.com/handstands.io/us-building-permit-scraper" class="btn btn-primary" target="_blank" rel="noopener" style="width:100%; justify-content:center;">
+        Start free on Apify →
+      </a>
+    </div>
+    <p style="font-size:14px; color: var(--text-muted); margin-top: 20px;">Example: one week of Chicago new construction permits = ~300 records = $0.45.</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="content">
+  <div class="section-inner">
+    <div class="section-label">Questions</div>
+    <h2>Frequently asked</h2>
+    <div class="faq">
+      <div class="faq-item">
+        <h4>Is this legal? Can I use building permit data commercially?</h4>
+        <p>Yes. Building permit data is public record, published by city and county governments on official open data portals. We access it via official government APIs. There are no legal restrictions on commercial use of public permit data.</p>
+      </div>
+      <div class="faq-item">
+        <h4>How fresh is the data?</h4>
+        <p>Most cities update daily. A few update weekly. LA and Dallas are exceptions — LA is typically 12–24 months behind, and Dallas hasn't updated since January 2024. Data freshness is documented per city in the tool.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Does it include contractor contact details?</h4>
+        <p>Most cities include contractor company name and license number. Some (Austin, Nashville) include a contact name. Phone numbers and emails are not in the permit data — you'll need to look those up separately using the contractor name and license.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Can I automate it to run without logging in every time?</h4>
+        <p>Yes. Save your configuration as an Apify Task and set a schedule (daily, weekly, etc.). Results are automatically available for export, or you can connect via Zapier or Make to push data to your CRM automatically.</p>
+      </div>
+      <div class="faq-item">
+        <h4>My city isn't on the list. Can you add it?</h4>
+        <p>Any city running Socrata open data can be added via the custom endpoints feature — no code required, just the domain and dataset ID. If you need a city added to the built-in list, contact us at hello@handstands.io.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div style="max-width: 640px; margin: 0 auto;">
+    <h2>Start finding leads before your competitors</h2>
+    <p>1,000 free permits included. No credit card required.</p>
+    <a href="https://apify.com/handstands.io/us-building-permit-scraper" class="btn btn-white" target="_blank" rel="noopener">
+      Try it free on Apify →
+    </a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <svg width="18" height="27" viewBox="0 0 80 120" xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true">
+        <line x1="5" y1="113" x2="25" y2="113" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="55" y1="113" x2="75" y2="113" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="15" y1="113" x2="40" y2="87" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="65" y1="113" x2="40" y2="87" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="40" cy="110" r="7" fill="#059669"/>
+        <line x1="40" y1="87" x2="40" y2="52" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="40" y1="52" x2="27" y2="13" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="40" y1="52" x2="53" y2="13" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="15" y1="6" x2="35" y2="6" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="45" y1="6" x2="65" y2="6" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+      </svg>
+      <span>© 2026 Handstands. All rights reserved.</span>
+    </div>
+    <div class="footer-links">
+      <a href="/">Home</a>
+      <a href="https://apify.com/handstands.io/us-building-permit-scraper" target="_blank" rel="noopener">Apify Listing</a>
+      <a href="mailto:hello@handstands.io">Contact</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
