@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Monitor any Shopify store's full product catalog, pricing, and inventory. Multi-store watchlists with automatic change detection. No scraping - uses Shopify's public API.">
+  <title>Shopify Store Intelligence - Product & Price Monitor | Handstands</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #ffffff;
+      --bg-subtle:    #F8FAFC;
+      --text:         #0F172A;
+      --text-muted:   #64748B;
+      --accent:       #059669;
+      --accent-hover: #047857;
+      --accent-light: #ECFDF5;
+      --border:       #E2E8F0;
+      --shadow:       0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+      --radius:       14px;
+      --font:         'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+    /* NAV */
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.90); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); padding: 0 24px; }
+    .nav-inner { max-width: 1080px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
+    .nav-wordmark { font-size: 17px; font-weight: 700; letter-spacing: -0.4px; }
+    .nav-wordmark .dot-io { color: var(--accent); }
+    .nav-cta { background: var(--text); color: #fff; padding: 8px 18px; border-radius: 8px; font-size: 14px; font-weight: 500; text-decoration: none; }
+
+    /* HERO */
+    .hero { padding: 88px 24px 72px; text-align: center; }
+    .hero-inner { max-width: 760px; margin: 0 auto; }
+    .eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); margin-bottom: 18px; }
+    h1 { font-size: clamp(36px, 5.5vw, 56px); font-weight: 800; line-height: 1.1; letter-spacing: -1.8px; margin-bottom: 22px; }
+    h1 em { font-style: normal; color: var(--accent); }
+    .hero-sub { font-size: clamp(17px, 2vw, 20px); color: var(--text-muted); max-width: 580px; margin: 0 auto 40px; line-height: 1.65; }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: 7px; font-size: 15px; font-weight: 600; padding: 13px 24px; border-radius: 10px; text-decoration: none; transition: all 0.15s; font-family: var(--font); cursor: pointer; border: none; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary { background: var(--bg); color: var(--text); border: 1.5px solid var(--border); }
+    .btn-secondary:hover { border-color: #94a3b8; }
+
+    /* STATS BAR */
+    .stats { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 32px 24px; }
+    .stats-inner { max-width: 1080px; margin: 0 auto; display: flex; justify-content: center; gap: 60px; flex-wrap: wrap; }
+    .stat { text-align: center; }
+    .stat-number { font-size: 32px; font-weight: 800; letter-spacing: -1px; color: var(--text); line-height: 1; }
+    .stat-label { font-size: 13px; color: var(--text-muted); margin-top: 5px; font-weight: 500; }
+
+    /* SECTIONS */
+    section.content { padding: 80px 24px; }
+    section.content.alt { background: var(--bg-subtle); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .section-inner { max-width: 1080px; margin: 0 auto; }
+    h2 { font-size: clamp(24px, 3.5vw, 34px); font-weight: 800; letter-spacing: -0.8px; line-height: 1.15; margin-bottom: 16px; }
+    .section-sub { font-size: 17px; color: var(--text-muted); margin-bottom: 48px; max-width: 600px; }
+
+    /* VERTICALS */
+    .verticals-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .vertical-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); }
+    .vertical-icon { font-size: 28px; margin-bottom: 14px; }
+    .vertical-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.3px; }
+    .vertical-card p { font-size: 15px; color: var(--text-muted); line-height: 1.65; }
+    .vertical-card ul { margin-top: 12px; padding-left: 18px; }
+    .vertical-card ul li { font-size: 14px; color: var(--text-muted); margin-bottom: 5px; }
+
+    /* DATA TABLE */
+    .data-preview { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); overflow-x: auto; box-shadow: var(--shadow); }
+    .data-preview table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 700px; }
+    .data-preview th { background: var(--bg-subtle); padding: 12px 16px; text-align: left; font-weight: 600; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.5px; }
+    .data-preview td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text); }
+    .data-preview tr:last-child td { border-bottom: none; }
+    .data-preview tr:nth-child(even) td { background: #FAFBFC; }
+    .tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; background: var(--accent-light); color: var(--accent); }
+    .tag-red { background: #FEF2F2; color: #DC2626; }
+    .tag-amber { background: #FFFBEB; color: #D97706; }
+
+    /* WORKFLOW */
+    .steps { display: flex; flex-direction: column; gap: 24px; max-width: 680px; }
+    .step { display: flex; gap: 20px; align-items: flex-start; }
+    .step-num { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step-content h4 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .step-content p { font-size: 15px; color: var(--text-muted); }
+
+    /* PRICING */
+    .pricing-centered { display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .pricing-centered .section-sub { margin-left: auto; margin-right: auto; }
+    .pricing-card { max-width: 480px; width: 100%; background: var(--bg); border: 2px solid var(--accent); border-radius: var(--radius); padding: 36px; box-shadow: var(--shadow); text-align: left; }
+    .price-label { font-size: 11.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+    .price { font-size: 48px; font-weight: 800; letter-spacing: -2px; color: var(--text); margin: 12px 0 4px; }
+    .price span { font-size: 20px; font-weight: 500; color: var(--text-muted); letter-spacing: 0; }
+    .pricing-note { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+    .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+    .pricing-features li { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; }
+    .check { color: var(--accent); font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* FAQ */
+    .faq { display: flex; flex-direction: column; gap: 28px; max-width: 720px; }
+    .faq-item h4 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .faq-item p { font-size: 15px; color: var(--text-muted); line-height: 1.65; }
+
+    /* CTA */
+    .cta-section { padding: 80px 24px; text-align: center; background: var(--text); color: #fff; }
+    .cta-section h2 { color: #fff; margin-bottom: 16px; }
+    .cta-section p { color: rgba(255,255,255,0.65); font-size: 18px; margin-bottom: 36px; }
+    .cta-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .btn-white { background: #fff; color: var(--text); }
+    .btn-white:hover { background: #f1f5f9; }
+    .btn-ghost { background: transparent; color: rgba(255,255,255,0.85); border: 1.5px solid rgba(255,255,255,0.3); }
+    .btn-ghost:hover { border-color: rgba(255,255,255,0.6); }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 28px 24px; }
+    .footer-inner { max-width: 1080px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .footer-brand { display: flex; align-items: center; gap: 10px; }
+    .footer-brand span { font-size: 14px; color: var(--text-muted); }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { font-size: 14px; color: var(--text-muted); text-decoration: none; }
+    .footer-links a:hover { color: var(--text); }
+
+    @media (max-width: 900px) {
+      .verticals-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .verticals-grid { grid-template-columns: 1fr; }
+      .stats-inner { gap: 32px; }
+      .hero { padding: 60px 20px 48px; }
+      .cta-section { padding: 60px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="/">
+      <svg width="22" height="33" viewBox="0 0 80 120" xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true">
+        <line x1="5" y1="113" x2="25" y2="113" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="55" y1="113" x2="75" y2="113" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="15" y1="113" x2="40" y2="87" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="65" y1="113" x2="40" y2="87" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="40" cy="110" r="7" fill="#059669"/>
+        <line x1="40" y1="87" x2="40" y2="52" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="40" y1="52" x2="27" y2="13" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="40" y1="52" x2="53" y2="13" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="15" y1="6" x2="35" y2="6" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="45" y1="6" x2="65" y2="6" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+      </svg>
+      <span class="nav-wordmark">handstands<span class="dot-io">.io</span></span>
+    </a>
+    <a href="https://apify.com/handstands.io/shopify-store-intelligence" class="nav-cta" target="_blank" rel="noopener">Try it free -&gt;</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">Shopify competitor intelligence</div>
+    <h1>Know what your competitors are selling - and <em>when they change it.</em></h1>
+    <p class="hero-sub">Monitor any Shopify store's full product catalog, pricing, and inventory. Multi-store watchlists with automatic change detection. No scraping - uses Shopify's own public API.</p>
+    <div class="hero-actions">
+      <a href="https://apify.com/handstands.io/shopify-store-intelligence" class="btn btn-primary" target="_blank" rel="noopener">
+        Try it free
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+      </a>
+      <a href="#how-it-works" class="btn btn-secondary">See how it works</a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stats-inner">
+    <div class="stat">
+      <div class="stat-number">4.6M</div>
+      <div class="stat-label">Shopify stores accessible</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">Daily</div>
+      <div class="stat-label">Monitoring available</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">$1.00</div>
+      <div class="stat-label">Per 1,000 results</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">0</div>
+      <div class="stat-label">Blocks or CAPTCHAs - ever</div>
+    </div>
+  </div>
+</div>
+
+<!-- VERTICALS -->
+<section class="content alt">
+  <div class="section-inner">
+    <h2>Built for Shopify competitive intelligence</h2>
+    <p class="section-sub">Whether you're a merchant, dropshipper, or analyst - knowing what competitors stock and charge is a genuine edge.</p>
+    <div class="verticals-grid">
+      <div class="vertical-card">
+        <div class="vertical-icon">&#128722;</div>
+        <h3>Shopify Merchants</h3>
+        <p>React to competitor price changes before your customers notice. Know when they launch new products or run sales.</p>
+        <ul>
+          <li>Monitor 1-100+ competitor stores</li>
+          <li>Get alerted when prices drop or rise</li>
+          <li>Spot new product launches instantly</li>
+        </ul>
+      </div>
+      <div class="vertical-card">
+        <div class="vertical-icon">&#128230;</div>
+        <h3>Dropshippers</h3>
+        <p>Track supplier stores and competitor dropshippers daily. See inventory signals and pricing shifts before they affect your margin.</p>
+        <ul>
+          <li>Monitor supplier stock availability</li>
+          <li>Track competitor pricing on shared SKUs</li>
+          <li>Spot trending products early</li>
+        </ul>
+      </div>
+      <div class="vertical-card">
+        <div class="vertical-icon">&#127959;&#65039;</div>
+        <h3>Brands &amp; Manufacturers</h3>
+        <p>Monitor resellers for MAP (minimum advertised price) violations. Know exactly who's discounting your products and by how much.</p>
+        <ul>
+          <li>Track all resellers selling your products</li>
+          <li>Flag MAP violations automatically</li>
+          <li>Monitor unauthorized sellers</li>
+        </ul>
+      </div>
+      <div class="vertical-card">
+        <div class="vertical-icon">&#128202;</div>
+        <h3>Agencies &amp; Analysts</h3>
+        <p>Pull clean, structured product data from any Shopify store for market research, client reporting, or trend analysis.</p>
+        <ul>
+          <li>Consistent schema across all stores</li>
+          <li>Full variant and SKU-level data</li>
+          <li>Historical change tracking</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DATA PREVIEW -->
+<section class="content">
+  <div class="section-inner">
+    <h2>What you get</h2>
+    <p class="section-sub">Every product returns clean, structured fields - no normalisation needed. Change detection flags what moved since your last run.</p>
+    <div class="data-preview">
+      <table>
+        <thead>
+          <tr>
+            <th>Store</th>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Compare-at</th>
+            <th>Discount</th>
+            <th>Variants</th>
+            <th>Changed</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>gymshark.com</td>
+            <td>Adapt Ombre Sports Bra</td>
+            <td>$42.00</td>
+            <td>$55.00</td>
+            <td><span class="tag">-24%</span></td>
+            <td>8</td>
+            <td><span class="tag tag-red">Price drop</span></td>
+          </tr>
+          <tr>
+            <td>allbirds.com</td>
+            <td>Men's Tree Runners</td>
+            <td>$98.00</td>
+            <td>-</td>
+            <td>-</td>
+            <td>12</td>
+            <td><span class="tag tag-amber">New variant</span></td>
+          </tr>
+          <tr>
+            <td>fashionnova.com</td>
+            <td>Bandage Mini Dress</td>
+            <td>$24.99</td>
+            <td>$49.99</td>
+            <td><span class="tag">-50%</span></td>
+            <td>4</td>
+            <td>-</td>
+          </tr>
+          <tr>
+            <td>skims.com</td>
+            <td>Fits Everybody Bodysuit</td>
+            <td>$62.00</td>
+            <td>-</td>
+            <td>-</td>
+            <td>22</td>
+            <td><span class="tag tag-red">Price rise</span></td>
+          </tr>
+          <tr>
+            <td>puravidabracelets.com</td>
+            <td>Classic Bracelet Pack</td>
+            <td>$14.00</td>
+            <td>$20.00</td>
+            <td><span class="tag">-30%</span></td>
+            <td>6</td>
+            <td><span class="tag tag-amber">New product</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13px; color: var(--text-muted); margin-top: 12px;">Also returns: product handle, vendor, product type, tags, variant SKUs, inventory policy, and full image URLs.</p>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="content alt" id="how-it-works">
+  <div class="section-inner">
+    <h2>Set up once, monitor forever</h2>
+    <p class="section-sub">No code required. Add stores, run on a schedule, get structured data.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Add your store watchlist</h4>
+          <p>Paste in any Shopify store URLs - competitors, suppliers, resellers. Add as many as you want. Any store running Shopify works, regardless of theme or customisation.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Run on demand or set a daily schedule</h4>
+          <p>Run manually for a one-off snapshot, or schedule daily runs in Apify. Each run pulls the full product catalog for every store in your list.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Get full catalogs with change flags</h4>
+          <p>Every product, every variant, every price - with a flag on anything that changed since the previous run. Price drops, new products, out-of-stock items - all surfaced automatically.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Export or push to your workflow</h4>
+          <p>Download as CSV/Excel, or connect via Zapier or Make to push changes directly into Google Sheets, Slack, or your CRM. Get notified when something moves.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="content">
+  <div class="section-inner pricing-centered">
+    <h2>Simple pay-per-use</h2>
+    <p class="section-sub">No subscription. No monthly fee. Pay only for what you pull.</p>
+    <div class="pricing-card">
+      <div class="price-label">Pay per result</div>
+      <div class="price">$1.00 <span>/ 1,000 results</span></div>
+      <p class="pricing-note">1,000 free trial results included. No credit card required to start.</p>
+      <ul class="pricing-features">
+        <li><span class="check">&#10003;</span> Unlimited stores per run</li>
+        <li><span class="check">&#10003;</span> Full product catalog + all variants</li>
+        <li><span class="check">&#10003;</span> Change detection between runs</li>
+        <li><span class="check">&#10003;</span> CSV, JSON, Excel export</li>
+        <li><span class="check">&#10003;</span> Zapier &amp; Make integration</li>
+        <li><span class="check">&#10003;</span> Schedule daily or weekly runs</li>
+      </ul>
+      <a href="https://apify.com/handstands.io/shopify-store-intelligence" class="btn btn-primary" target="_blank" rel="noopener" style="width:100%; justify-content:center;">
+        Start free on Apify -&gt;
+      </a>
+    </div>
+    <p style="font-size:14px; color: var(--text-muted); margin-top: 20px;">Example: a full catalog pull from 10 mid-size stores (~5,000 products) costs $5.00.</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="content alt">
+  <div class="section-inner">
+    <h2>Frequently asked</h2>
+    <div class="faq">
+      <div class="faq-item">
+        <h4>Is this legal? Am I scraping Shopify stores?</h4>
+        <p>No scraping involved. Shopify exposes a public <code>/products.json</code> endpoint on every store - it's a documented feature, not a loophole. We access it exactly as a browser would. There are no legal restrictions on reading publicly accessible product data.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Which stores does it work on?</h4>
+        <p>Any store running Shopify - regardless of theme, plan, or customisation. That's roughly 4.6 million stores worldwide. You just need the store's domain.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Will it get blocked or hit CAPTCHAs?</h4>
+        <p>No. Because we use Shopify's own public API endpoint rather than scraping rendered pages, there are no blocks, CAPTCHAs, or anti-bot measures to deal with. It's the same data Shopify makes available to any browser.</p>
+      </div>
+      <div class="faq-item">
+        <h4>How does change detection work?</h4>
+        <p>Each run compares the current catalog against the previous run's data. Any product where the price, compare-at price, inventory status, or variant count changed gets flagged in the output. New products and removed products are also flagged.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Can I automate it to run daily without logging in?</h4>
+        <p>Yes. Save your store list as an Apify Task and set a schedule. Results are automatically available for export, or connect via Zapier or Make to push changes to a spreadsheet or trigger a Slack notification when something moves.</p>
+      </div>
+      <div class="faq-item">
+        <h4>What if I need something custom?</h4>
+        <p>Get in touch at <a href="mailto:hello@handstands.io" style="color: var(--accent);">hello@handstands.io</a> - we're happy to discuss custom store lists, volume pricing, or specific data requirements.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div style="max-width: 640px; margin: 0 auto;">
+    <h2>Start monitoring your competitors today</h2>
+    <p>1,000 free results included. No credit card required.</p>
+    <div class="cta-actions">
+      <a href="https://apify.com/handstands.io/shopify-store-intelligence" class="btn btn-white" target="_blank" rel="noopener">
+        Try it free on Apify -&gt;
+      </a>
+      <a href="mailto:hello@handstands.io" class="btn btn-ghost">
+        Get in touch
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <svg width="18" height="27" viewBox="0 0 80 120" xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true">
+        <line x1="5" y1="113" x2="25" y2="113" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="55" y1="113" x2="75" y2="113" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="15" y1="113" x2="40" y2="87" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="65" y1="113" x2="40" y2="87" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="40" cy="110" r="7" fill="#059669"/>
+        <line x1="40" y1="87" x2="40" y2="52" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="40" y1="52" x2="27" y2="13" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="40" y1="52" x2="53" y2="13" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="15" y1="6" x2="35" y2="6" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+        <line x1="45" y1="6" x2="65" y2="6" stroke="#0F172A" stroke-width="7" stroke-linecap="round"/>
+      </svg>
+      <span>&#169; 2026 Handstands. All rights reserved.</span>
+    </div>
+    <div class="footer-links">
+      <a href="/">Home</a>
+      <a href="https://apify.com/handstands.io/shopify-store-intelligence" target="_blank" rel="noopener">Apify Listing</a>
+      <a href="mailto:hello@handstands.io">Contact</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
